@@ -18,11 +18,14 @@ const AnimatedBox = Animated.createAnimatedComponent(Box);
 export default function App() {
   const Y = new Animated.Value(0);
   const moveUp = () => {
-      Animated.timing(Y, {
+      Animated.spring(Y, {
         toValue: -200,
+        bounciness: 20,
+        speed:30,
+        useNativeDriver: true
       }).start();
   };
-  Y.addListener(() => console.log(Y));
+  Y.addListener(() => console.log(Y))
   console.log(Y);
   return (
     <Container>

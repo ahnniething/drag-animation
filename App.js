@@ -18,21 +18,19 @@ const AnimatedBox = Animated.createAnimatedComponent(Box);
 export default function App() {
   const Y = new Animated.Value(0);
   const moveUp = () => {
-      Animated.spring(Y, {
-        toValue: -200,
-        bounciness: 20,
-        speed:30,
-        useNativeDriver: true
-      }).start();
+    Animated.spring(Y, {
+      toValue: -200,
+      tension: 100,
+      friction: 0.5,
+      useNativeDriver: true,
+    }).start();
   };
-  Y.addListener(() => console.log(Y))
+  Y.addListener(() => console.log(Y));
   console.log(Y);
   return (
     <Container>
-      <TouchableOpacity  onPress={moveUp}>
-      <AnimatedBox
-        style={{ transform: [{ translateY: Y }] }}
-      />
+      <TouchableOpacity onPress={moveUp}>
+        <AnimatedBox style={{ transform: [{ translateY: Y }] }} />
       </TouchableOpacity>
     </Container>
   );

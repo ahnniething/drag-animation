@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components/native";
-import { Animated, Dimensions, Easing, Pre, Pressable, Te } from "react-native";
+import { Animated, PanResponder } from "react-native";
 
 const Container = styled.View`
   flex: 1;
@@ -21,93 +21,37 @@ const Text = styled.Text`
 
 const AnimatedBox = Animated.createAnimatedComponent(Box);
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function App() {
-  const [xColor, setXColor] = useState(false);
-  const position = useRef(new Animated.ValueXY({ x: -SCREEN_WIDTH / 2 + 100, y: -SCREEN_HEIGHT / 2 + 100})).current;
-  const topLeft = Animated.timing(position, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    duration:3000,
-    useNativeDriver: false,
-  });
+  const position = useRef(new Animated.ValueXY({ x:0, y: 0})).current;
 
-  const bottomLeft = Animated.timing(position, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: SCREEN_HEIGHT / 2 - 100,
-    },
-    duration:3000,
-    useNativeDriver: false,
-  });
 
-  const bottomRight = Animated.timing(position, {
-    toValue: {
-      x: SCREEN_WIDTH / 2 - 100,
-      y: SCREEN_HEIGHT / 2 - 100,
-    },
-    duration:3000,
-    useNativeDriver: false,
-  });
-
-  const topRight = Animated.timing(position, {
-    toValue: {
-      x: SCREEN_WIDTH / 2 - 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    duration:3000,
-    useNativeDriver: false,
-  });
-
-  const moveUp = () => {
-    Animated.loop(
-      Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
-    ).start();
-  };
-
-  const rotation = position.y.interpolate({
-    inputRange: [-300, 300],
-    outputRange: ["-360deg", "360deg"],
-  });
-  const bgColorY = position.y.interpolate({
+  const bgColor = position.y.interpolate({
     inputRange: [-300,  300],
     outputRange: ["rgb(252, 239, 207)","rgb(0, 0, 0)"],
   });
-  const bgColorX = position.x.interpolate({
-    inputRange: [-95,  95],
-    outputRange: ["rgb(1, 239, 207)", "rgb(0, 0, 0)"],
-  });
 
-  position.y.addListener(() => {
-    JSON.stringify(position.y).replace('-','') === "322" ? setXColor(true) :  setXColor(false);
-  });
-
-  const StyledAnimatedBox = (props) => {
-    return (
-      <Pressable
-        onPress={() => {
-          moveUp(3000);
-        }}
-      >
-        <AnimatedBox
+  const panResponder = useRef(PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, {dx, dy}) => {
+      position.setValue({
+        x: dx,
+        y: dy
+      });
+    }
+  })).current;
+  return (
+    <Container>
+      <AnimatedBox
+      {...panResponder.panHandlers}
           style={{
             borderRadius :100,
-            backgroundColor : xColor ?  bgColorX : bgColorY,
+            backgroundColor :bgColor ,
             transform: [...position.getTranslateTransform()],
           }}
         >
           <Text>ahnniething</Text>
         </AnimatedBox>
-      </Pressable>
-    );
-  };
-
-  return (
-    <Container>
-      <StyledAnimatedBox></StyledAnimatedBox>
     </Container>
   );
 }

@@ -24,13 +24,14 @@ const AnimatedBox = Animated.createAnimatedComponent(Box);
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function App() {
-  const [up, setUp] = useState(false);
+  const [xColor, setXColor] = useState(false);
   const position = useRef(new Animated.ValueXY({ x: -SCREEN_WIDTH / 2 + 100, y: -SCREEN_HEIGHT / 2 + 100})).current;
   const topLeft = Animated.timing(position, {
     toValue: {
       x: -SCREEN_WIDTH / 2 + 100,
       y: -SCREEN_HEIGHT / 2 + 100,
     },
+    duration:3000,
     useNativeDriver: false,
   });
 
@@ -39,6 +40,7 @@ export default function App() {
       x: -SCREEN_WIDTH / 2 + 100,
       y: SCREEN_HEIGHT / 2 - 100,
     },
+    duration:3000,
     useNativeDriver: false,
   });
 
@@ -47,6 +49,7 @@ export default function App() {
       x: SCREEN_WIDTH / 2 - 100,
       y: SCREEN_HEIGHT / 2 - 100,
     },
+    duration:3000,
     useNativeDriver: false,
   });
 
@@ -55,6 +58,7 @@ export default function App() {
       x: SCREEN_WIDTH / 2 - 100,
       y: -SCREEN_HEIGHT / 2 + 100,
     },
+    duration:3000,
     useNativeDriver: false,
   });
 
@@ -68,17 +72,17 @@ export default function App() {
     inputRange: [-300, 300],
     outputRange: ["-360deg", "360deg"],
   });
-  const bgColor = position.y.interpolate({
-    inputRange: [-300, 300],
-    outputRange: ["rgb(156, 207, 19)", "rgb(253, 255, 0)"],
+  const bgColorY = position.y.interpolate({
+    inputRange: [-300,  300],
+    outputRange: ["rgb(252, 239, 207)","rgb(0, 0, 0)"],
   });
-  const borderRadius = position.y.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [100, 0],
+  const bgColorX = position.x.interpolate({
+    inputRange: [-95,  95],
+    outputRange: ["rgb(1, 239, 207)", "rgb(0, 0, 0)"],
   });
 
   position.y.addListener(() => {
-    console.log("Y VALUE:", position);
+    JSON.stringify(position.y).replace('-','') === "322" ? setXColor(true) :  setXColor(false);
   });
 
   const StyledAnimatedBox = (props) => {
@@ -90,8 +94,8 @@ export default function App() {
       >
         <AnimatedBox
           style={{
-            borderRadius,
-            backgroundColor: bgColor,
+            borderRadius :100,
+            backgroundColor : xColor ?  bgColorX : bgColorY,
             transform: [...position.getTranslateTransform()],
           }}
         >

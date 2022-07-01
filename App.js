@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components/native";
-import { Animated, Easing, Pre, Pressable, Te } from "react-native";
+import { Animated, Dimensions, Easing, Pre, Pressable, Te } from "react-native";
 
 const Container = styled.View`
   flex: 1;
@@ -10,6 +10,8 @@ const Container = styled.View`
 `;
 const Box = styled.View`
   justify-content: center;
+  width: 200px;
+  height: 200px;
 `;
 
 const Text = styled.Text`
@@ -19,82 +21,85 @@ const Text = styled.Text`
 
 const AnimatedBox = Animated.createAnimatedComponent(Box);
 
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
 export default function App() {
-  const [up, setUp] = useState(false);
-  const Y_POSITION = useRef(new Animated.Value(300)).current;
-  const toggleUp = () => setUp((prev) => !prev);
-  const moveUp = (duration) => {
-    Animated.timing(Y_POSITION, {
-      toValue: up ? 300 : -300,
-      useNativeDriver: false,
-      duration: duration,
-    }).start(toggleUp);
+  const [xColor, setXColor] = useState(false);
+  const position = useRef(new Animated.ValueXY({ x: -SCREEN_WIDTH / 2 + 100, y: -SCREEN_HEIGHT / 2 + 100})).current;
+  const topLeft = Animated.timing(position, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    },
+    duration:3000,
+    useNativeDriver: false,
+  });
+
+  const bottomLeft = Animated.timing(position, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    duration:3000,
+    useNativeDriver: false,
+  });
+
+  const bottomRight = Animated.timing(position, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    duration:3000,
+    useNativeDriver: false,
+  });
+
+  const topRight = Animated.timing(position, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    },
+    duration:3000,
+    useNativeDriver: false,
+  });
+
+  const moveUp = () => {
+    Animated.loop(
+      Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
+    ).start();
   };
 
-  const height = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [50, 100],
-  });
-  const width = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [50, 100],
-  });
-  const borderBottomLeftRadius = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [120, 0],
-  });
-  const borderTopRightRadius = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [180, 0],
-  });
-  const borderBottomRightRadius = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [0, 60],
-  });
-  const borderTopLeftRadius = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: [0, 60],
-  });
-  const rotation = Y_POSITION.interpolate({
+  const rotation = position.y.interpolate({
     inputRange: [-300, 300],
     outputRange: ["-360deg", "360deg"],
   });
-  const bgColor = Y_POSITION.interpolate({
-    inputRange: [-300, 300],
-    outputRange: ["rgb(156, 207, 19)", "rgb(253, 255, 0)"],
+  const bgColorY = position.y.interpolate({
+    inputRange: [-300,  300],
+    outputRange: ["rgb(252, 239, 207)","rgb(0, 0, 0)"],
   });
-  const opacity = Y_POSITION.interpolate({
-    inputRange: [-300, -100, 100, 300],
-    outputRange: [1, 0, 0, 1],
+  const bgColorX = position.x.interpolate({
+    inputRange: [-95,  95],
+    outputRange: ["rgb(1, 239, 207)", "rgb(0, 0, 0)"],
   });
-  Y_POSITION.addListener(() => {
-    console.log(rotation);
-    console.log("Y VALUE:", Y_POSITION);
-    console.log("rotation VALUE:", rotation);
-    console.log("bgColor VALUE:", bgColor);
+
+  position.y.addListener(() => {
+    JSON.stringify(position.y).replace('-','') === "322" ? setXColor(true) :  setXColor(false);
   });
 
   const StyledAnimatedBox = (props) => {
     return (
       <Pressable
         onPress={() => {
-          moveUp(props.second*1000);
+          moveUp(3000);
         }}
       >
         <AnimatedBox
           style={{
-            height,
-            width,
-            borderTopRightRadius,
-            borderBottomLeftRadius,
-            borderBottomRightRadius,
-            borderTopLeftRadius,
-            backgroundColor: bgColor,
-            opacity,
-            transform: [{ rotateY: rotation }, { translateY: Y_POSITION }],
+            borderRadius :100,
+            backgroundColor : xColor ?  bgColorX : bgColorY,
+            transform: [...position.getTranslateTransform()],
           }}
         >
-          <Text>{props.second} sec</Text>
+          <Text>ahnniething</Text>
         </AnimatedBox>
       </Pressable>
     );
@@ -102,9 +107,7 @@ export default function App() {
 
   return (
     <Container>
-        <StyledAnimatedBox second={1}></StyledAnimatedBox>
-        <StyledAnimatedBox second={3}></StyledAnimatedBox>
-        <StyledAnimatedBox second={5}></StyledAnimatedBox>
+      <StyledAnimatedBox></StyledAnimatedBox>
     </Container>
   );
 }

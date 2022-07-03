@@ -47,7 +47,7 @@ export default function App() {
           style={{
             borderRadius :100,
             backgroundColor :bgColor ,
-            transform: [...position.getTranslateTransform()],
+            transform: position.getTranslateTransform(),
           }}
         >
           <Text>ahnniething</Text>

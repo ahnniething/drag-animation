@@ -10,8 +10,8 @@ const Container = styled.View`
 `;
 const Box = styled.View`
   justify-content: center;
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
 `;
 
 const Text = styled.Text`

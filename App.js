@@ -21,37 +21,48 @@ const Text = styled.Text`
 
 const AnimatedBox = Animated.createAnimatedComponent(Box);
 
-
 export default function App() {
-  const position = useRef(new Animated.ValueXY({ x:0, y: 0})).current;
-
+  const position = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   const bgColor = position.y.interpolate({
-    inputRange: [-300,  300],
-    outputRange: ["rgb(252, 239, 207)","rgb(0, 0, 0)"],
+    inputRange: [-300, 300],
+    outputRange: ["rgb(252, 239, 207)", "rgb(0, 0, 0)"],
   });
 
-  const panResponder = useRef(PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (_, {dx, dy}) => {
-      position.setValue({
-        x: dx,
-        y: dy
-      });
-    }
-  })).current;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, { dx, dy }) => {
+        position.setValue({
+          x: dx,
+          y: dy,
+        });
+      },
+      onPanResponderRelease: () => {
+        console.log("Touch Finished");
+        Animated.spring(position, {
+          toValue: {
+            x: 0,
+            y: 0,
+          },
+          useNativeDriver: false,
+          bounciness: 10,
+        }).start();
+      },
+    })
+  ).current;
   return (
     <Container>
       <AnimatedBox
-      {...panResponder.panHandlers}
-          style={{
-            borderRadius :100,
-            backgroundColor :bgColor ,
-            transform: position.getTranslateTransform(),
-          }}
-        >
-          <Text>ahnniething</Text>
-        </AnimatedBox>
+        {...panResponder.panHandlers}
+        style={{
+          borderRadius: 100,
+          backgroundColor: bgColor,
+          transform: position.getTranslateTransform(),
+        }}
+      >
+        <Text>ahnniething</Text>
+      </AnimatedBox>
     </Container>
   );
 }

@@ -48,6 +48,7 @@ export default function App() {
       },
       onPanResponderRelease: () => {
         console.log("Touch Finished");
+        position.flattenOffset();
       },
     })
   ).current;
